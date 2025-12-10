@@ -1,0 +1,12 @@
+pandas
+numpy
+yfinance
+scikit-learn
+tensorflow==2.20.0
+matplotlib
+seaborn
+plotly
+streamlit
+pyyaml
+tqdm
+python-dotenv

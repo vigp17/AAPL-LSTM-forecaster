@@ -43,23 +43,35 @@ def load_artifacts():
 def download_stock_data(ticker, period="3y"):
     """Download stock data with caching and retry logic"""
     import time
-    max_retries = 3
+    max_retries = 5
     
     for attempt in range(max_retries):
         try:
-            # Use Ticker object for more reliable downloads
+            # Method 1: Use Ticker object
             stock = yf.Ticker(ticker)
             df = stock.history(period=period)
             
             if not df.empty and 'Close' in df.columns:
                 return df['Close'].dropna()
             
-            time.sleep(1)
+            # Method 2: Direct download as fallback
+            df_alt = yf.download(ticker, period=period, progress=False, 
+                                 threads=False, ignore_tz=True)
+            if not df_alt.empty:
+                if 'Close' in df_alt.columns:
+                    return df_alt['Close'].dropna()
+                elif isinstance(df_alt.columns, pd.MultiIndex):
+                    return df_alt['Close'][ticker].dropna()
+            
+            # Wait before retry
+            if attempt < max_retries - 1:
+                time.sleep(2 * (attempt + 1))  # Exponential backoff
+            
         except Exception as e:
             if attempt == max_retries - 1:
                 st.error(f"Download failed after {max_retries} attempts: {str(e)}")
                 return None
-            time.sleep(2)
+            time.sleep(2 * (attempt + 1))
     
     return None
 
@@ -74,8 +86,8 @@ with st.spinner("Downloading latest AAPL data..."):
     df = download_stock_data(ticker)
 
 if df is None or len(df) == 0:
-    st.error("Could not download stock data. Please try again later.")
-    st.info("Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
+    st.error("❌ Could not download stock data. Please try again later.")
+    st.info("💡 Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
     st.stop()
 
 # Success - show data info

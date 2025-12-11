@@ -36,19 +36,38 @@ if model is None or scaler is None:
 # Live data + prediction
 ticker = "AAPL"
 try:
-    # Download only Close price
-    df = yf.download(ticker, period="3y", progress=False)
+    # Download full data
+    df_raw = yf.download(ticker, period="3y", progress=False)
     
-    # Handle multi-index columns from yfinance
-    if isinstance(df.columns, pd.MultiIndex):
-        df = df['Close']
+    if df_raw.empty:
+        st.error("Failed to download data from Yahoo Finance. Please try again.")
+        st.stop()
+    
+    # Extract Close price - handle both single and multi-ticker formats
+    if 'Close' in df_raw.columns:
+        df = df_raw['Close']
+    elif isinstance(df_raw.columns, pd.MultiIndex):
+        df = df_raw[('Close', ticker)]
     else:
-        df = df['Close']
+        st.error("Unexpected data format from Yahoo Finance")
+        st.stop()
     
+    # Convert to Series if needed and drop NaN
+    if isinstance(df, pd.DataFrame):
+        df = df.squeeze()
     df = df.dropna()
+    
+    if len(df) == 0:
+        st.error("No valid data after cleaning. Please try again.")
+        st.stop()
+    
+    # Debug info
+    st.write(f"Downloaded {len(df)} data points")
+    st.write(f"Data range: {df.index[0]} to {df.index[-1]}")
     
     # Ensure it's a proper 2D array for scaler
     close_values = df.values.reshape(-1, 1)
+    st.write(f"Close values shape: {close_values.shape}")
     
     # Transform
     scaled = scaler.transform(close_values)

@@ -1,26 +1,4 @@
-# Download data
-ticker = "AAPL"
-with st.spinner("Downloading latest AAPL data..."):
-    df = download_stock_data(ticker)
-
-# If download fails, try to load from local CSV as fallback
-if df is None or len(df) == 0:
-    st.warning("⚠️ Could not download live data from Yahoo Finance.")
-    
-    # Try to load from local data
-    try:
-        import os
-        data_path = "data/raw/raw_aapl.csv"
-        if os.path.exists(data_path):
-            st.info("📊 Using cached historical data from training set.")
-            df_local = pd.read_csv(data_path, index_col=0, parse_dates=True)
-            df = df_local['Close'].dropna()
-        else:
-            st.error("No fallback data available. Cannot make predictions.")
-            st.stop()
-    except Exception as e:
-        st.error(f"Error loading fallback data: {e}")
-        st.stop()# app/app.py
+# app/app.py
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -107,10 +85,23 @@ ticker = "AAPL"
 with st.spinner("Downloading latest AAPL data..."):
     df = download_stock_data(ticker)
 
+# If download fails, try to load from local CSV as fallback
 if df is None or len(df) == 0:
-    st.error("Could not download stock data. Please try again later.")
-    st.info("Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
-    st.stop()
+    st.warning("Could not download live data from Yahoo Finance.")
+    
+    # Try to load from local data
+    try:
+        data_path = "data/raw/raw_aapl.csv"
+        if os.path.exists(data_path):
+            st.info("Using cached historical data from training set.")
+            df_local = pd.read_csv(data_path, index_col=0, parse_dates=True)
+            df = df_local['Close'].dropna()
+        else:
+            st.error("No fallback data available. Cannot make predictions.")
+            st.stop()
+    except Exception as e:
+        st.error(f"Error loading fallback data: {e}")
+        st.stop()
 
 # Success - show data info
 st.success(f"✓ Downloaded {len(df)} days of data ({df.index[0].strftime('%Y-%m-%d')} to {df.index[-1].strftime('%Y-%m-%d')})")

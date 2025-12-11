@@ -32,7 +32,7 @@ End-to-end stock price forecasting pipeline built entirely in VS Code (zero Jupy
 
 ### Run Locally (100% live data)
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/aapl-lstm-forecaster.git
+git clone https://github.com/vigp17/aapl-lstm-forecaster.git
 cd aapl-lstm-forecaster
 
 python -m venv .venv

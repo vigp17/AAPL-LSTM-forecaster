@@ -74,8 +74,8 @@ with st.spinner("Downloading latest AAPL data..."):
     df = download_stock_data(ticker)
 
 if df is None or len(df) == 0:
-    st.error("❌ Could not download stock data. Please try again later.")
-    st.info("💡 Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
+    st.error("Could not download stock data. Please try again later.")
+    st.info("Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
     st.stop()
 
 # Success - show data info

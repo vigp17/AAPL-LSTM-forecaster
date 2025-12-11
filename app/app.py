@@ -4,11 +4,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['GRPC_VERBOSITY'] = 'ERROR'
 
+# Set these BEFORE importing tensorflow
+os.environ['TF_NUM_INTEROP_THREADS'] = '1'
+os.environ['TF_NUM_INTRAOP_THREADS'] = '1'
+
 import tensorflow as tf
-# Force CPU mode for M1 Mac stability
+# Force CPU mode (this is still safe to do)
 tf.config.set_visible_devices([], 'GPU')
-tf.config.threading.set_inter_op_parallelism_threads(1)
-tf.config.threading.set_intra_op_parallelism_threads(1)
 
 import streamlit as st
 import pandas as pd
@@ -72,8 +74,8 @@ with st.spinner("Downloading latest AAPL data..."):
     df = download_stock_data(ticker)
 
 if df is None or len(df) == 0:
-    st.error("Could not download stock data. Please try again later.")
-    st.info("Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
+    st.error("❌ Could not download stock data. Please try again later.")
+    st.info("💡 Yahoo Finance may be experiencing issues or rate limiting. Try refreshing in a minute.")
     st.stop()
 
 # Success - show data info

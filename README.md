@@ -44,4 +44,4 @@ pip install tensorflow==2.20.0
 python -m scripts.05_evaluate
 
 # Launch web app with real-time prices
-streamlit run app/app.py
+python -m streamlit run app/app.py

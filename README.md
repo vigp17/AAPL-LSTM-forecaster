@@ -2,7 +2,7 @@
 
 ![Final Model Performance](reports/figures/final_prediction_vs_actual.png)
 
-**Live Demo** → https://aapl-lstm-forecaster.streamlit.app  
+**Live Demo** → https://aapl-lstm-forecaster.streamlit.app
 **Test Set Results** → **RMSE $6.67** | **MAPE 2.32%**
 
 ### Project Overview
